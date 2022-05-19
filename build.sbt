@@ -17,7 +17,7 @@ ThisBuild / licenses     := List("Apache-2.0" -> url("http://www.apache.org/lice
 ThisBuild / publishTo := Some(
   s"Github $GITHUB_OWNER Apache Maven Packages of $GITHUB_PROJECT" at s"https://maven.pkg.github.com/$GITHUB_OWNER/$GITHUB_PROJECT"
 )
-ThisBuild / resolvers += s"GitHub $GITHUB_OWNER Apache Maven Packages" at s"https://maven.pkg.github.com/$GITHUB_OWNER/_/"
+ThisBuild / resolvers += s"GitHub $GITHUB_OWNER Apache Maven_Packages" at s"https://maven.pkg.github.com/$GITHUB_OWNER/_/"
 ThisBuild / developers := List(
   Developer(
     "jdegoes",
@@ -81,9 +81,10 @@ lazy val zioCache = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .settings(buildInfoSettings("zio.cache"))
   .settings(
     libraryDependencies ++= Seq(
-      "dev.zio" %% "zio"          % zioVersion,
-      "dev.zio" %% "zio-test"     % zioVersion % Test,
-      "dev.zio" %% "zio-test-sbt" % zioVersion % Test
+      "dev.zio"                %% "zio"                     % zioVersion,
+      "org.scala-lang.modules" %% "scala-collection-compat" % "2.7.0",
+      "dev.zio"                %% "zio-test"                % zioVersion % Test,
+      "dev.zio"                %% "zio-test-sbt"            % zioVersion % Test
     )
   )
   .settings(testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"))
