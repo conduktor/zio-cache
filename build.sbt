@@ -1,22 +1,43 @@
 import BuildHelper._
+import scala.sys.process._
 
-inThisBuild(
-  List(
-    organization := "dev.zio",
-    homepage     := Some(url("https://zio.github.io/zio-cache/")),
-    licenses     := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
-    developers := List(
-      Developer(
-        "jdegoes",
-        "John De Goes",
-        "john@degoes.net",
-        url("http://degoes.net")
-      )
-    ),
-    pgpPassphrase := sys.env.get("PGP_PASSWORD").map(_.toArray),
-    pgpPublicRing := file("/tmp/public.asc"),
-    pgpSecretRing := file("/tmp/secret.asc")
+import scala.util.Try
+
+val GITHUB_OWNER                   = "conduktor"
+val GITHUB_PROJECT                 = "zio-cache"
+def env(v: String): Option[String] = sys.env.get(v)
+
+ThisBuild / version := sys.env.getOrElse(
+  "RELEASE_VERSION",
+  "0.0.1-SNAPSHOT"
+) // "RELEASE_VERSION" comes from.github/workflows/release.yml
+ThisBuild / organization := "dev.zio"
+ThisBuild / homepage     := Some(url("https://zio.github.io/zio-cache/"))
+ThisBuild / licenses     := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0"))
+ThisBuild / publishTo := Some(
+  s"Github $GITHUB_OWNER Apache Maven Packages of $GITHUB_PROJECT" at s"https://maven.pkg.github.com/$GITHUB_OWNER/$GITHUB_PROJECT"
+)
+ThisBuild / resolvers += s"GitHub $GITHUB_OWNER Apache Maven Packages" at s"https://maven.pkg.github.com/$GITHUB_OWNER/_/"
+ThisBuild / developers := List(
+  Developer(
+    "jdegoes",
+    "John De Goes",
+    "john@degoes.net",
+    url("http://degoes.net")
   )
+)
+ThisBuild / publishMavenStyle := true
+ThisBuild / credentials += Credentials(
+  "GitHub Package Registry",
+  "maven.pkg.github.com",
+  GITHUB_OWNER,
+  (env("GH_PACKAGES_TOKEN") orElse env("GH_READ_PACKAGES") orElse env("GITHUB_TOKEN"))
+    .orElse(Try(s"git config github.token".!!).map(_.trim).toOption)
+    .getOrElse(
+      throw new RuntimeException(
+        "Missing env variable: `GH_PACKAGES_TOKEN` or `GH_READ_PACKAGES` or `GITHUB_TOKEN` or git config option: `github.token`"
+      )
+    )
 )
 
 addCommandAlias("fmt", "all scalafmtSbt scalafmt test:scalafmt")
